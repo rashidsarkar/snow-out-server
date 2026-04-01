@@ -21,8 +21,6 @@ app.use(
       'http://10.10.20.3:5454',
       'http://192.168.0.107:3000',
       'http://192.168.0.104:3000',
-      'https://claimly-with-api.vercel.app',
-      'https://claimly-dashbord-with-api.vercel.app',
       'http://localhost:5173',
       'http://localhost:3000',
       'http://10.10.20.48:5173',
@@ -51,7 +49,7 @@ app.use('/uploads', express.static('uploads'));
 //Not Found
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World! From claim insurance server with rongila');
+  res.send('Hello World! From snow out server with rongila');
 });
 
 app.use(globalErrorHandler);
