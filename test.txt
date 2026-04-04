@@ -1,5 +1,5 @@
 const getAllBlogFromDb = async (query: Record<string, unknown>) => {
-  // console.log(query);
+  // console.log(query);..
   const queryObj = { ...query };
   const searchAbleFields = ['title', 'content'];
   const excludeField = ['search', 'sortOrder', 'sortBy'];
