@@ -1,3 +1,6 @@
+import { StatusCodes } from 'http-status-codes';
+import AppError from '../../errors/AppError';
+import Service from '../service/service.model';
 import { ITask } from './task.interface';
 import Task from './task.model';
 
@@ -8,6 +11,10 @@ const getAllTasks = async () => {
 
 // Create a task
 const createTask = async (payload: Partial<ITask>) => {
+  const service = await Service.findById(payload.serviceType);
+  if (!service) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Service not found');
+  }
   const task = new Task(payload);
   return await task.save();
 };

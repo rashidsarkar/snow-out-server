@@ -16,7 +16,10 @@ const getAllTasks = catchAsync(async (req, res) => {
 
 // Create a task
 const createTask = catchAsync(async (req, res) => {
-  const result = await TaskService.createTask(req.body);
+  const result = await TaskService.createTask({
+    ...req.body,
+    customerId: req.user.profileId,
+  });
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     success: true,
