@@ -3,7 +3,7 @@ import { TaskStatus, TaskTimeType } from './task.interface';
 
 export const createTaskData = z.object({
   body: z.object({
-    customerId: z.string(),
+    customerId: z.string().optional(),
     provider: z.string().optional(),
     serviceType: z.string(),
 
@@ -13,11 +13,11 @@ export const createTaskData = z.object({
     taskStatus: z.nativeEnum(TaskStatus).optional(),
     taskTime: z.nativeEnum(TaskTimeType),
 
-    serviceLocation: z.string().optional(),
+    serviceLocation: z.string(),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
 
-    details: z.string().optional(),
+    details: z.string(),
 
     scheduledDate: z.string().optional(), // date string
     scheduledTime: z.string().optional(),
