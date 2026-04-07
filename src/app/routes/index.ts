@@ -6,6 +6,7 @@ import { notificationRoutes } from '../modules/notification/notification.routes'
 import { normalUserRoutes } from '../modules/normalUser/normalUser.routes';
 import { ManageRoutes } from '../modules/manage-web/manage.routes';
 import { metaRoutes } from '../modules/meta/meta.routes';
+import { TaskRoutes } from '../modules/task/task.routes';
 
 const router = Router();
 
@@ -33,6 +34,10 @@ const moduleRoutes = [
   {
     path: '/manage-Web',
     route: ManageRoutes,
+  },
+  {
+    path: '/task',
+    route: TaskRoutes,
   },
 ];
 
