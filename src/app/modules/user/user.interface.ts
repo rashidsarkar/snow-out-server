@@ -18,6 +18,7 @@ export type TUser = {
   isResetOTPVerified?: boolean;
   isVerifyEmailOTPVerified?: boolean;
   playerIds: string[];
+  isVerified: boolean;
 };
 export type TLoginUser = {
   email: string;
