@@ -3,7 +3,7 @@ import AppError from '../../errors/AppError';
 import { TUser, UpdateUserPayload } from './user.interface';
 import { User } from './user.model';
 import mongoose from 'mongoose';
-import NormalUser from '../normalUser/normalUser.model';
+// import NormalUser from '../normalUser/normalUser.model';
 import { ENUM_USER_ROLE, USER_ROLE } from './user.const';
 import { createNormalUserData } from '../normalUser/normalUser.validation';
 import { emailSender } from '../../utils/emailSender';
@@ -11,6 +11,7 @@ import { emailSender } from '../../utils/emailSender';
 import unlinkFile from '../../utils/unLinkFile';
 import { deleteFileFromS3 } from '../../utils/deleteFromS3';
 import Admin from '../admin/admin.model';
+import Customer from '../customer/customer.model';
 
 const generateVerifyCode = (): number => {
   return Math.floor(100000 + Math.random() * 900000);
@@ -85,10 +86,14 @@ const createUserIntoDB = async (userData: TUser) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let profileModel: any;
     switch (userData.role) {
-      case USER_ROLE.NORMALUSER:
-        createNormalUserData.parse({ body: { ...userData } });
-        profileModel = NormalUser;
+      case USER_ROLE.CUSTOMER:
+        // createNormalUserData.parse({ body: { ...userData } });
+        profileModel = Customer;
         break;
+
+      // case USER_ROLE.PROVIDER:
+      //   profileModel = Admin;
+      //   break;
 
       default:
         throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid user role');

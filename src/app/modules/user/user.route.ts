@@ -6,7 +6,7 @@ import { UserValidation } from './user.validation';
 
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from './user.const';
-import { uploadFile } from '../../utils/multer-s3-uploader';
+import { uploadFile } from '../../utils/fileUploader';
 
 const router = express.Router();
 router.post(

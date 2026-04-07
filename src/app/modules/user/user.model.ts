@@ -27,6 +27,7 @@ const userSchema = new Schema<TUser>(
     isResetOTPVerified: { type: Boolean, default: false },
     isVerifyEmailOTPVerified: { type: Boolean, default: false },
     playerIds: { type: [String], default: [] },
+    isVerified: { type: Boolean, default: false },
   },
   {
     timestamps: true,
