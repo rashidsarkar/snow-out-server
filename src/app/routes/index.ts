@@ -7,6 +7,8 @@ import { normalUserRoutes } from '../modules/normalUser/normalUser.routes';
 import { ManageRoutes } from '../modules/manage-web/manage.routes';
 import { metaRoutes } from '../modules/meta/meta.routes';
 import { TaskRoutes } from '../modules/task/task.routes';
+import { stripeRoutes } from '../modules/stripe/stripe.routes';
+// import { paymentRoutes } from '../modules/payment/payment.routes';
 
 const router = Router();
 
@@ -38,6 +40,10 @@ const moduleRoutes = [
   {
     path: '/task',
     route: TaskRoutes,
+  },
+  {
+    path: '/stripe',
+    route: stripeRoutes,
   },
 ];
 
