@@ -1,12 +1,16 @@
 import Stripe from 'stripe';
 import config from '../config';
-const stripe = new Stripe(config.stripe.stripe_secret_key);
 
-const isAccountReady = async (accountId) => {
+// const stripe = new Stripe(config.stripe.stripe_secret_key);
+const stripe = new (Stripe as any)(config.stripe.stripe_secret_key as string, {
+  apiVersion: '2023-10-16',
+});
+
+const isAccountReady = async (accountId: string) => {
   try {
     const account = await stripe.accounts.retrieve(accountId);
     const { capabilities, requirements } = account;
-    const isTransfersActive = capabilities?.transfers === 'active';
+    // const isTransfersActive = capabilities?.transfers === 'active';
     // console.log('currently due', requirements?.currently_due);
     // const isReady = isTransfersActive;
     const isReady =
