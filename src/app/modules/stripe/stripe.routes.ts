@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post(
   '/connect-stripe',
-  auth(USER_ROLE.CUSTOMER),
+  auth(USER_ROLE.PROVIDER),
   StripeController.createOnboardingLink,
 );
 

@@ -12,6 +12,7 @@ import unlinkFile from '../../utils/unLinkFile';
 import { deleteFileFromS3 } from '../../utils/deleteFromS3';
 import Admin from '../admin/admin.model';
 import Customer from '../customer/customer.model';
+import Provider from '../provider/provider.model';
 
 const generateVerifyCode = (): number => {
   return Math.floor(100000 + Math.random() * 900000);
@@ -91,9 +92,9 @@ const createUserIntoDB = async (userData: TUser) => {
         profileModel = Customer;
         break;
 
-      // case USER_ROLE.PROVIDER:
-      //   profileModel = Admin;
-      //   break;
+      case USER_ROLE.PROVIDER:
+        profileModel = Provider;
+        break;
 
       default:
         throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid user role');

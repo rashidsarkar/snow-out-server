@@ -1,17 +1,13 @@
-import Stripe from 'stripe';
-import config from '../../config';
-import Customer from '../customer/customer.model';
 import AppError from '../../errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import { User } from '../user/user.model';
+import Provider from '../provider/provider.model';
+import stripe from '../../utils/stripe';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const stripe = new (Stripe as any)(config.stripe.stripe_secret_key as string, {
-  apiVersion: '2023-10-16',
-});
 
 const createConnectedAccountAndOnboardingLink = async (userData, profileId) => {
-  const provider = await Customer.findById(profileId).populate('user', 'email');
+  const provider = await Provider.findById(profileId).populate('user', 'email');
   const user = await User.findOne({ profileId }).select('email');
   if (!provider || !user)
     throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
@@ -29,7 +25,7 @@ const createConnectedAccountAndOnboardingLink = async (userData, profileId) => {
     settings: { payouts: { schedule: { interval: 'manual' } } },
   });
 
-  const updateUser = await Customer.findByIdAndUpdate(
+  const updateUser = await Provider.findByIdAndUpdate(
     profileId,
     { stripeAccountId: account.id },
     { new: true, runValidators: true },
@@ -42,7 +38,7 @@ const createConnectedAccountAndOnboardingLink = async (userData, profileId) => {
 
   const onboardingLink = await stripe.accountLinks.create({
     account: account.id,
-    refresh_url: `http://localhost:3000/reauth?accountId=${account.id}`,
+    refresh_url: `http://localhost:5555/stripe/onboarding/refresh?accountId=${account.id}`,
     return_url: 'http://localhost:3000',
     type: 'account_onboarding',
   });

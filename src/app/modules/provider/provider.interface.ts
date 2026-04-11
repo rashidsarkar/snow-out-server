@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 
 export interface IProvider {
-  userId: Types.ObjectId;
+  user: Types.ObjectId;
   serviceId: Types.ObjectId[]; // multiple services
 
   rating?: number;
