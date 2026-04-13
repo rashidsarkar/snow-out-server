@@ -9,8 +9,9 @@ import stripe from '../../utils/stripe';
 const createConnectedAccountAndOnboardingLink = async (userData, profileId) => {
   const provider = await Provider.findById(profileId).populate('user', 'email');
   const user = await User.findOne({ profileId }).select('email');
-  if (!provider || !user)
+  if (!provider || !user) {
     throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
+  }
 
   //   if(provider.stripeAccountId){
   //   }
@@ -45,9 +46,26 @@ const createConnectedAccountAndOnboardingLink = async (userData, profileId) => {
   return onboardingLink.url;
 };
 
+const updateOnboardingLink = async (profileId: string) => {
+  const provider = await Provider.findById(profileId).populate('user', 'email');
+  const user = await User.findOne({ profileId }).select('email');
+  if (!provider || !user) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
+  }
+  const stripAccountId = provider?.stripeAccountId;
+  const accountLink = await stripe.accountLinks.create({
+    account: stripAccountId as string,
+    refresh_url: `http://localhost:5555/stripe/onboarding/refresh?accountId=${account.id}`,
+    return_url: 'http://localhost:3000',
+    type: 'account_onboarding',
+  });
+
+  return { link: accountLink.url };
+};
+
 const StripeService = {
   createConnectedAccountAndOnboardingLink,
-  //   updateOnboardingLink,
+  updateOnboardingLink,
 };
 
 export default StripeService;
