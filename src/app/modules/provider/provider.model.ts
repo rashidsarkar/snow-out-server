@@ -15,7 +15,7 @@ const providerSchema = new Schema<IProvider>(
 
     bio: { type: String },
 
-    stripeConnected: { type: Boolean, default: false },
+    isStripeConnected: { type: Boolean, default: false },
     stripeAccountId: { type: String },
 
     address: { type: String },

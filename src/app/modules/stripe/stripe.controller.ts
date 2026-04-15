@@ -16,9 +16,24 @@ const createOnboardingLink = catchAsync(async (req, res) => {
   });
 });
 
+const createPaymentSession = catchAsync(async (req, res) => {
+  const { amount, taskId } = req.body;
+  // const customerId = req.user.profileId; // কাস্টমারের প্রোফাইল আইডি
+
+  const result = await StripeService.createPaymentSession(amount, taskId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Payment session created successfully',
+    data: result,
+  });
+});
+
 const StripeController = {
   createOnboardingLink,
-  //   updateOnboardingLink,
+  // updateOnboardingLink,
+  createPaymentSession,
 };
 
 export default StripeController;

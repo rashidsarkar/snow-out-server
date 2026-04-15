@@ -7,6 +7,8 @@ import config from '../config';
 import StripeService from '../modules/stripe/stripe.service';
 import stripe from '../utils/stripe';
 import updateStripeConnectedAccountStatus from './updateStripeAccountConnectedStatus';
+import Task from '../modules/task/task.model';
+import { TaskStatus } from '../modules/task/task.interface';
 
 // const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const handleConnectedAccountWebhook = async (req: Request, res: Response) => {
@@ -49,6 +51,35 @@ const handleConnectedAccountWebhook = async (req: Request, res: Response) => {
 
         break;
       }
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const { taskId, amount } = session.metadata;
+        console.log('Payment successful for task:', taskId, 'Amount:', amount);
+
+        if (!taskId) {
+          console.error('taskId not found in checkout session metadata');
+          break;
+        }
+
+        try {
+          const updatedTask = await Task.findByIdAndUpdate(
+            taskId,
+            { taskStatus: TaskStatus.ASSIGNED },
+            { new: true },
+          );
+
+          if (updatedTask) {
+            console.log('Task updated successfully:', updatedTask._id);
+          } else {
+            console.error('Task not found with ID:', taskId);
+          }
+        } catch (err) {
+          console.error('Error updating task:', err);
+        }
+
+        break;
+      }
+
       default:
         console.log(`Unhandled event type ${event.type}`);
     }

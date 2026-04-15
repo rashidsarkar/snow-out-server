@@ -63,9 +63,38 @@ const updateOnboardingLink = async (profileId: string) => {
   return { link: accountLink.url };
 };
 
+const createPaymentSession = async (amount: number, taskId: string) => {
+  const totalAmount = amount * 100;
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `Payment for task ${taskId}`,
+          },
+          unit_amount: totalAmount,
+        },
+        quantity: 1,
+      },
+    ],
+    success_url: `http://localhost:5555/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `http://localhost:3000/payment/cancel?session_id={CHECKOUT_SESSION_ID}`,
+    metadata: {
+      taskId: taskId.toString(),
+      amount: totalAmount,
+    },
+  });
+
+  return session;
+};
+
 const StripeService = {
   createConnectedAccountAndOnboardingLink,
   updateOnboardingLink,
+  createPaymentSession,
 };
 
 export default StripeService;

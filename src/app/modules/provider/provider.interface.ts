@@ -10,7 +10,7 @@ export interface IProvider {
 
   bio?: string;
 
-  stripeConnected?: boolean;
+  isStripeConnected?: boolean;
   stripeAccountId?: string;
 
   address?: string;
