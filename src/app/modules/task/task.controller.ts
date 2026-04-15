@@ -49,12 +49,24 @@ const getTaskById = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const counterOfferForTask = catchAsync(async (req, res) => {
+  const { counterOffer, taskId } = req.body;
+
+  const result = await TaskService.counterOfferForTask(taskId, counterOffer);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Counter offer updated successfully',
+    data: result,
+  });
+});
 
 const TaskController = {
   getAllTasks,
   createTask,
   updateTask,
   getTaskById,
+  counterOfferForTask,
 };
 
 export default TaskController;

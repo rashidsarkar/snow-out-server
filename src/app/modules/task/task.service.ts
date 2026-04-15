@@ -32,11 +32,27 @@ const getTaskById = async (id: string) => {
   return await Task.findById(id);
 };
 
+const counterOfferForTask = async (taskID: string, counterOffer: string) => {
+  const result = await Task.findByIdAndUpdate(
+    taskID,
+    { counterOffer: counterOffer },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  if (!result) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Task not found');
+  }
+  return result;
+};
+
 const TaskService = {
   getAllTasks,
   createTask,
   updateTask,
   getTaskById,
+  counterOfferForTask,
 };
 
 export default TaskService;
