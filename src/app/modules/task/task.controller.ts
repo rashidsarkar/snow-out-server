@@ -52,7 +52,12 @@ const getTaskById = catchAsync(async (req, res) => {
 const counterOfferForTask = catchAsync(async (req, res) => {
   const { counterOffer, taskId } = req.body;
 
-  const result = await TaskService.counterOfferForTask(taskId, counterOffer);
+  const result = await TaskService.counterOfferForTask(
+    taskId,
+    counterOffer,
+    req.user.role,
+    req.user.profileId,
+  );
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

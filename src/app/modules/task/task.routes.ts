@@ -14,7 +14,11 @@ router.post(
   validateRequest(TaskValidations.createTaskData),
   TaskController.createTask,
 );
-router.patch('/counter-offer', TaskController.counterOfferForTask);
+router.patch(
+  '/counter-offer',
+  auth(USER_ROLE.CUSTOMER, USER_ROLE.PROVIDER),
+  TaskController.counterOfferForTask,
+);
 router.patch('/:id', TaskController.updateTask);
 router.get('/:id', TaskController.getTaskById);
 export const TaskRoutes = router;
