@@ -65,6 +65,21 @@ const counterOfferForTask = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const cancelRequestForTask = catchAsync(async (req, res) => {
+  const { taskId } = req.body;
+
+  const result = await TaskService.cancelRequestForTask(
+    taskId,
+    req.user.profileId,
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Task cancelled successfully',
+    data: result,
+  });
+});
 
 const TaskController = {
   getAllTasks,
@@ -72,6 +87,7 @@ const TaskController = {
   updateTask,
   getTaskById,
   counterOfferForTask,
+  cancelRequestForTask,
 };
 
 export default TaskController;

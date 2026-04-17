@@ -1,13 +1,15 @@
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../errors/AppError';
 import Service from '../service/service.model';
-import { ITask } from './task.interface';
+import { ITask, TaskStatus } from './task.interface';
 import Task from './task.model';
 import { USER_ROLE } from '../user/user.const';
 
 // Get all tasks
 const getAllTasks = async () => {
-  return await Task.find().sort({ createdAt: -1 });
+  return await Task.find({ taskStatus: { $ne: TaskStatus.CANCELLED } }).sort({
+    createdAt: -1,
+  });
 };
 
 // Create a task
@@ -65,12 +67,25 @@ const counterOfferForTask = async (
   return result;
 };
 
+const cancelRequestForTask = async (taskId: string, profileId: string) => {
+  const result = await Task.findOneAndUpdate(
+    { _id: taskId, customerId: profileId },
+    { taskStatus: TaskStatus.CANCELLED, provider: null },
+    { new: true },
+  );
+  if (!result) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Task not found');
+  }
+  return result;
+};
+
 const TaskService = {
   getAllTasks,
   createTask,
   updateTask,
   getTaskById,
   counterOfferForTask,
+  cancelRequestForTask,
 };
 
 export default TaskService;
