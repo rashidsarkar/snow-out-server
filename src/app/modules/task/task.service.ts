@@ -78,7 +78,20 @@ const cancelRequestForTask = async (taskId: string, profileId: string) => {
   }
   return result;
 };
-
+const findAnotherProviderForTask = async (
+  taskId: string,
+  profileId: string,
+) => {
+  const task = await Task.findOneAndUpdate(
+    { _id: taskId, customerId: profileId },
+    { provider: null },
+    { new: true },
+  );
+  if (!task) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Task not found');
+  }
+  return task;
+};
 const TaskService = {
   getAllTasks,
   createTask,
@@ -86,6 +99,7 @@ const TaskService = {
   getTaskById,
   counterOfferForTask,
   cancelRequestForTask,
+  findAnotherProviderForTask,
 };
 
 export default TaskService;
