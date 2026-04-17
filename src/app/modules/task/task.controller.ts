@@ -80,6 +80,21 @@ const cancelRequestForTask = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const findAnotherProviderForTask = catchAsync(async (req, res) => {
+  const { taskId } = req.body;
+
+  const result = await TaskService.findAnotherProviderForTask(
+    taskId,
+    req.user.profileId,
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Provider removed. You can find another provider now',
+    data: result,
+  });
+});
 
 const TaskController = {
   getAllTasks,
@@ -88,6 +103,7 @@ const TaskController = {
   getTaskById,
   counterOfferForTask,
   cancelRequestForTask,
+  findAnotherProviderForTask,
 };
 
 export default TaskController;

@@ -24,6 +24,11 @@ router.patch(
   auth(USER_ROLE.CUSTOMER), // usually only customer cancels
   TaskController.cancelRequestForTask,
 );
+router.patch(
+  '/find-another-provider',
+  auth(USER_ROLE.CUSTOMER), // only customer should do this
+  TaskController.findAnotherProviderForTask,
+);
 router.patch('/:id', TaskController.updateTask);
 router.get('/:id', TaskController.getTaskById);
 export const TaskRoutes = router;
