@@ -4,6 +4,7 @@ import Service from '../service/service.model';
 import { ITask, TaskStatus } from './task.interface';
 import Task from './task.model';
 import { USER_ROLE } from '../user/user.const';
+import mongoose from 'mongoose';
 
 // Get all tasks
 const getAllTasks = async () => {

@@ -48,8 +48,9 @@ router.patch(
   auth(USER_ROLE.PROVIDER),
   TaskController.providerAcceptTask,
 );
-router.post(
-  '/before-after-photos',
+router.patch(
+  '/before-after-photos/:taskId',
+
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -59,7 +60,7 @@ router.post(
   },
   auth(USER_ROLE.CUSTOMER, USER_ROLE.PROVIDER),
 
-  TaskController.createTask,
+  TaskController.beforeAfterPhotos,
 );
 router.patch('/:id', TaskController.updateTask);
 router.get('/:id', TaskController.getTaskById);
