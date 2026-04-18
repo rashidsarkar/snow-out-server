@@ -29,6 +29,11 @@ router.patch(
   auth(USER_ROLE.CUSTOMER), // only customer should do this
   TaskController.findAnotherProviderForTask,
 );
+router.get(
+  '/provider-tasks',
+  auth(USER_ROLE.PROVIDER),
+  TaskController.providerTask,
+);
 router.patch('/:id', TaskController.updateTask);
 router.get('/:id', TaskController.getTaskById);
 export const TaskRoutes = router;

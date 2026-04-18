@@ -95,6 +95,16 @@ const findAnotherProviderForTask = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const providerTask = catchAsync(async (req, res) => {
+  const result = await TaskService.providerTask(req.user.profileId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Provider tasks retrieved successfully',
+    data: result,
+  });
+});
 
 const TaskController = {
   getAllTasks,
@@ -104,6 +114,7 @@ const TaskController = {
   counterOfferForTask,
   cancelRequestForTask,
   findAnotherProviderForTask,
+  providerTask,
 };
 
 export default TaskController;

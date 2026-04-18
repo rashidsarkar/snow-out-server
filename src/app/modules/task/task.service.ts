@@ -92,6 +92,21 @@ const findAnotherProviderForTask = async (
   }
   return task;
 };
+
+const providerTask = async (profileId: string) => {
+  const result = await Task.find({ provider: profileId }).sort({
+    createdAt: -1,
+  });
+
+  if (result.length === 0) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'No tasks found for this provider',
+    );
+  }
+
+  return result;
+};
 const TaskService = {
   getAllTasks,
   createTask,
@@ -100,6 +115,7 @@ const TaskService = {
   counterOfferForTask,
   cancelRequestForTask,
   findAnotherProviderForTask,
+  providerTask,
 };
 
 export default TaskService;

@@ -80,7 +80,7 @@ const createPaymentSession = async (amount: number, taskId: string) => {
         quantity: 1,
       },
     ],
-    success_url: `http://localhost:5555/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `https://hzb1xrx1-5555.asse.devtunnels.ms/payment-success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `http://localhost:3000/payment/cancel?session_id={CHECKOUT_SESSION_ID}`,
     metadata: {
       taskId: taskId.toString(),
