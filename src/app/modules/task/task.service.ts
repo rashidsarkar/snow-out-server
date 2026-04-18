@@ -107,6 +107,29 @@ const providerTask = async (profileId: string) => {
 
   return result;
 };
+
+const providerAcceptTask = async (taskId: string, providerId: string) => {
+  const task = await Task.findOneAndUpdate(
+    {
+      _id: taskId,
+      provider: providerId,
+      hasProviderAccepted: { $ne: true }, // prevent double accept
+      taskStatus: { $ne: TaskStatus.CANCELLED }, // can't accept cancelled
+    },
+    { hasProviderAccepted: true },
+    { new: true },
+  );
+
+  if (!task) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'Task not found or already accepted/cancelled',
+    );
+  }
+
+  return task;
+};
+
 const TaskService = {
   getAllTasks,
   createTask,
@@ -116,6 +139,7 @@ const TaskService = {
   cancelRequestForTask,
   findAnotherProviderForTask,
   providerTask,
+  providerAcceptTask,
 };
 
 export default TaskService;

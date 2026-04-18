@@ -38,7 +38,7 @@ const taskSchema = new Schema<ITask>(
     scheduledDate: { type: Date },
     scheduledTime: { type: String },
 
-    hasProvider: { type: Boolean, default: false },
+    hasProviderAccepted: { type: Boolean, default: false },
 
     taskPhotos: { type: [String], default: [] },
     beforePhotos: { type: [String], default: [] },

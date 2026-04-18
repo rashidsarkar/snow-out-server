@@ -35,7 +35,7 @@ export interface ITask {
   scheduledDate?: Date;
   scheduledTime?: string;
 
-  hasProvider?: boolean;
+  hasProviderAccepted?: boolean;
 
   taskPhotos?: string[];
   beforePhotos?: string[];

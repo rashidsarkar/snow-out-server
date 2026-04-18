@@ -34,6 +34,11 @@ router.get(
   auth(USER_ROLE.PROVIDER),
   TaskController.providerTask,
 );
+router.patch(
+  '/accept-task/:taskId',
+  auth(USER_ROLE.PROVIDER),
+  TaskController.providerAcceptTask,
+);
 router.patch('/:id', TaskController.updateTask);
 router.get('/:id', TaskController.getTaskById);
 export const TaskRoutes = router;
