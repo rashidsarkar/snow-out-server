@@ -23,7 +23,7 @@ router.post(
 );
 router.get(
   '/getMe',
-  auth(USER_ROLE.NORMALUSER, USER_ROLE.ADMIN),
+  auth(USER_ROLE.CUSTOMER, USER_ROLE.ADMIN),
   UserControllers.getMe,
 );
 router.get(
@@ -37,7 +37,7 @@ router.get('/getAllUser', auth(USER_ROLE.ADMIN), UserControllers.getUsers);
 
 router.patch(
   '/updateMe',
-  auth(USER_ROLE.NORMALUSER, USER_ROLE.ADMIN),
+  auth(USER_ROLE.CUSTOMER, USER_ROLE.ADMIN),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {

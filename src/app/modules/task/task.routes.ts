@@ -1,15 +1,24 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
+
 import TaskController from './task.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import TaskValidations from './task.validation';
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.const';
+import { uploadFile } from '../../utils/fileUploader';
 
 const router = express.Router();
 
 router.get('/', TaskController.getAllTasks);
 router.post(
   '/create-task',
+  uploadFile(),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+    }
+    next();
+  },
   auth(USER_ROLE.CUSTOMER),
   validateRequest(TaskValidations.createTaskData),
   TaskController.createTask,
@@ -38,6 +47,12 @@ router.patch(
   '/accept-task/:taskId',
   auth(USER_ROLE.PROVIDER),
   TaskController.providerAcceptTask,
+);
+router.post(
+  '/before-after-photos',
+  auth(USER_ROLE.CUSTOMER, USER_ROLE.PROVIDER),
+
+  TaskController.createTask,
 );
 router.patch('/:id', TaskController.updateTask);
 router.get('/:id', TaskController.getTaskById);

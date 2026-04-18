@@ -16,6 +16,10 @@ const getAllTasks = catchAsync(async (req, res) => {
 
 // Create a task
 const createTask = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'taskPhotos' in files) {
+    req.body.taskPhotos = files['taskPhotos'][0].path;
+  }
   const result = await TaskService.createTask({
     ...req.body,
     customerId: req.user.profileId,
@@ -118,6 +122,23 @@ const providerAcceptTask = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const beforeAfterPhotos = catchAsync(async (req, res) => {
+  const { taskId } = req.params;
+  const { files } = req;
+  if (files && typeof files === 'object' && 'beforePhotos' in files) {
+    req.body.beforePhotos = files['beforePhotos'][0].path;
+  }
+  if (files && typeof files === 'object' && 'afterPhotos' in files) {
+    req.body.afterPhotos = files['afterPhotos'][0].path;
+  }
+  const result = await TaskService.beforeAfterPhotos(taskId, req.body);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Photos updated successfully',
+    data: result,
+  });
+});
 
 const TaskController = {
   getAllTasks,
@@ -129,6 +150,7 @@ const TaskController = {
   findAnotherProviderForTask,
   providerTask,
   providerAcceptTask,
+  beforeAfterPhotos,
 };
 
 export default TaskController;

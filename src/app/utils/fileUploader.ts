@@ -19,8 +19,8 @@ export const uploadFile = () => {
           uploadPath = 'uploads/images/profile';
           break;
 
-        case 'supporting_Documents':
-          uploadPath = 'uploads/images/supporting_Documents';
+        case 'taskPhotos':
+          uploadPath = 'uploads/images/taskPhotos';
           break;
 
         case 'report_Document':
@@ -39,8 +39,8 @@ export const uploadFile = () => {
           uploadPath = 'uploads/images/article_image';
           break;
 
-        case 'category_image':
-          uploadPath = 'uploads/images/category_images';
+        case 'afterPhotos':
+          uploadPath = 'uploads/images/afterPhotoss';
           break;
 
         case 'video':
@@ -74,9 +74,9 @@ export const uploadFile = () => {
     const allowedFieldnames = [
       'image',
       'profile_image',
-      'supporting_Documents',
-      'appointment_images',
-      'category_image',
+      'taskPhotos',
+      'beforePhotos',
+      'afterPhotos',
       'report_Document',
       'medical_family_image',
       'insurance_Photo',
@@ -118,9 +118,9 @@ export const uploadFile = () => {
   }).fields([
     { name: 'image', maxCount: 1 },
     { name: 'profile_image', maxCount: 1 },
-    { name: 'supporting_Documents', maxCount: 4 },
-    { name: 'appointment_images', maxCount: 3 },
-    { name: 'category_image', maxCount: 1 },
+    { name: 'taskPhotos', maxCount: 5 },
+    { name: 'beforePhotos', maxCount: 5 },
+    { name: 'afterPhotos', maxCount: 5 },
     { name: 'report_Document', maxCount: 4 },
     { name: 'medical_family_image', maxCount: 4 },
     { name: 'insurance_Photo', maxCount: 4 },

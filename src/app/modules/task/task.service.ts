@@ -129,7 +129,38 @@ const providerAcceptTask = async (taskId: string, providerId: string) => {
 
   return task;
 };
+const beforeAfterPhotos = async (taskId: string, payload: any) => {
+  if (!mongoose.Types.ObjectId.isValid(taskId)) {
+    throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid taskId');
+  }
 
+  const updateData: Record<string, any> = {};
+
+  if (payload.beforePhotos) {
+    updateData.beforePhotos = payload.beforePhotos;
+  }
+
+  if (payload.afterPhotos) {
+    updateData.afterPhotos = payload.afterPhotos;
+  }
+
+  // nothing to update
+  if (Object.keys(updateData).length === 0) {
+    throw new AppError(StatusCodes.BAD_REQUEST, 'No photos provided to update');
+  }
+
+  const result = await Task.findByIdAndUpdate(
+    taskId,
+    { $set: updateData },
+    { new: true },
+  );
+
+  if (!result) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Task not found');
+  }
+
+  return result;
+};
 const TaskService = {
   getAllTasks,
   createTask,
@@ -140,6 +171,7 @@ const TaskService = {
   findAnotherProviderForTask,
   providerTask,
   providerAcceptTask,
+  beforeAfterPhotos,
 };
 
 export default TaskService;
