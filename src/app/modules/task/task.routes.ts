@@ -50,6 +50,13 @@ router.patch(
 );
 router.post(
   '/before-after-photos',
+  uploadFile(),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+    }
+    next();
+  },
   auth(USER_ROLE.CUSTOMER, USER_ROLE.PROVIDER),
 
   TaskController.createTask,
