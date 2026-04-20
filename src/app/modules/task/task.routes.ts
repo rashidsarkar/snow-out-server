@@ -62,6 +62,11 @@ router.patch(
 
   TaskController.beforeAfterPhotos,
 );
+router.patch(
+  '/complete-and-pay',
+  auth(USER_ROLE.CUSTOMER),
+  TaskController.customerCompleteAndPay,
+);
 router.patch('/:id', TaskController.updateTask);
 router.get('/:id', TaskController.getTaskById);
 export const TaskRoutes = router;

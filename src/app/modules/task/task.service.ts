@@ -5,6 +5,9 @@ import { ITask, TaskStatus } from './task.interface';
 import Task from './task.model';
 import { USER_ROLE } from '../user/user.const';
 import mongoose from 'mongoose';
+import Provider from '../provider/provider.model';
+import isAccountReady from '../../helper/isAccountReady';
+import stripe from '../../utils/stripe';
 
 // Get all tasks
 const getAllTasks = async () => {
@@ -113,11 +116,15 @@ const providerAcceptTask = async (taskId: string, providerId: string) => {
   const task = await Task.findOneAndUpdate(
     {
       _id: taskId,
-      provider: providerId,
+
       hasProviderAccepted: { $ne: true }, // prevent double accept
       taskStatus: { $ne: TaskStatus.CANCELLED }, // can't accept cancelled
     },
-    { hasProviderAccepted: true },
+    {
+      hasProviderAccepted: true,
+      provider: providerId,
+      taskStatus: TaskStatus.ASSIGNED,
+    },
     { new: true },
   );
 
@@ -135,7 +142,7 @@ const beforeAfterPhotos = async (taskId: string, payload: any) => {
     throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid taskId');
   }
 
-  const updateData: Record<string, any> = {};
+  const updateData: Partial<ITask> = {};
 
   if (payload.beforePhotos) {
     updateData.beforePhotos = payload.beforePhotos;
@@ -144,6 +151,7 @@ const beforeAfterPhotos = async (taskId: string, payload: any) => {
   if (payload.afterPhotos) {
     updateData.taskCompletedAt = new Date(); // set completion time when after photos are uploaded
     updateData.afterPhotos = payload.afterPhotos;
+    updateData.markedCompletedFromProvider = true; // provider marks as completed when uploading after photos
   }
 
   // nothing to update
@@ -163,6 +171,114 @@ const beforeAfterPhotos = async (taskId: string, payload: any) => {
 
   return result;
 };
+
+const customerCompleteAndPay = async (taskId: string, profileId: string) => {
+  console.log('🔵 Start: customerCompleteAndPay');
+  console.log('➡️ taskId:', taskId);
+  console.log('➡️ profileId:', profileId);
+
+  // 1. Find task
+  console.log('🔍 Finding task...');
+  const task = await Task.findOne({
+    _id: taskId,
+    customerId: profileId,
+    hasProviderAccepted: true,
+    taskStatus: { $ne: TaskStatus.CANCELLED },
+  });
+
+  if (!task) {
+    console.log('❌ Task not found or invalid state');
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'Task not found or cannot be completed',
+    );
+  }
+
+  console.log('✅ Task found:', task._id);
+
+  // Prevent duplicate payment
+  if (task.taskStatus === TaskStatus.COMPLETED) {
+    console.log('⚠️ Task already completed');
+    throw new AppError(StatusCodes.BAD_REQUEST, 'Task already completed');
+  }
+
+  // 2. Get provider
+  console.log('🔍 Fetching provider...');
+  const provider = await Provider.findById(task.provider);
+
+  if (!provider) {
+    console.log('❌ Provider not found');
+    throw new AppError(StatusCodes.NOT_FOUND, 'Provider not found');
+  }
+
+  console.log('✅ Provider found:', provider._id);
+
+  if (!provider.stripeAccountId) {
+    console.log('❌ Provider has no Stripe account');
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      'Provider has no Stripe account',
+    );
+  }
+
+  console.log('💳 Stripe Account ID:', provider.stripeAccountId);
+
+  // 3. Check Stripe readiness
+  console.log('🔍 Checking Stripe account readiness...');
+  const isReady = await isAccountReady(provider.stripeAccountId);
+
+  if (!isReady) {
+    console.log('❌ Stripe account not ready');
+    throw new AppError(StatusCodes.BAD_REQUEST, 'Provider account not ready');
+  }
+
+  console.log('✅ Stripe account is ready');
+
+  // 4. Calculate amount
+  console.log('💰 Calculating payment...');
+  const totalAmount = task.taskValue;
+  const adminFee = Math.round(totalAmount * 0.2);
+  const payableAmount = totalAmount - adminFee;
+  const amountInCent = Math.round(payableAmount * 100);
+
+  console.log('➡️ Total:', totalAmount);
+  console.log('➡️ Admin Fee (20%):', adminFee);
+  console.log('➡️ Payable:', payableAmount);
+  console.log('➡️ Amount in cents:', amountInCent);
+
+  // 5. Transfer money
+  console.log('🚀 Initiating Stripe transfer...');
+  const transfer = await stripe.transfers.create({
+    amount: amountInCent,
+    currency: 'usd',
+    destination: provider.stripeAccountId,
+    metadata: {
+      taskId: task._id.toString(),
+    },
+  });
+
+  console.log('✅ Transfer successful');
+  console.log('➡️ Transfer ID:', transfer.id);
+
+  // 6. Update task
+  console.log('📝 Updating task status...');
+  const updatedTask = await Task.findByIdAndUpdate(
+    taskId,
+    {
+      markedCompletedFromCustomer: true,
+      taskStatus: TaskStatus.COMPLETED,
+      paymentTransferId: transfer.id,
+    },
+    { new: true },
+  );
+
+  console.log('✅ Task updated successfully');
+
+  console.log('🟢 End: customerCompleteAndPay');
+
+  return updatedTask;
+};
+
 const TaskService = {
   getAllTasks,
   createTask,
@@ -174,6 +290,7 @@ const TaskService = {
   providerTask,
   providerAcceptTask,
   beforeAfterPhotos,
+  customerCompleteAndPay,
 };
 
 export default TaskService;

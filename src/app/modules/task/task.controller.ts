@@ -139,6 +139,21 @@ const beforeAfterPhotos = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const customerCompleteAndPay = catchAsync(async (req, res) => {
+  const { taskId } = req.body;
+
+  const result = await TaskService.customerCompleteAndPay(
+    taskId,
+    req.user.profileId,
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Task completed and payment transferred successfully',
+    data: result,
+  });
+});
 
 const TaskController = {
   getAllTasks,
@@ -151,6 +166,7 @@ const TaskController = {
   providerTask,
   providerAcceptTask,
   beforeAfterPhotos,
+  customerCompleteAndPay,
 };
 
 export default TaskController;
