@@ -23,8 +23,8 @@ export const uploadFile = () => {
           uploadPath = 'uploads/images/taskPhotos';
           break;
 
-        case 'report_Document':
-          uploadPath = 'uploads/images/report_Document';
+        case 'beforePhotos':
+          uploadPath = 'uploads/images/beforePhotos';
           break;
 
         case 'medical_family_image':

@@ -142,6 +142,7 @@ const beforeAfterPhotos = async (taskId: string, payload: any) => {
   }
 
   if (payload.afterPhotos) {
+    updateData.taskCompletedAt = new Date(); // set completion time when after photos are uploaded
     updateData.afterPhotos = payload.afterPhotos;
   }
 

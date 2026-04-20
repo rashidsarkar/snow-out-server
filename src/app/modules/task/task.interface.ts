@@ -46,6 +46,8 @@ export interface ITask {
 
   rating?: number;
   review?: string;
+  markedCompletedFromCustomer?: boolean;
+  markedCompletedFromProvider?: boolean;
 
   createdAt?: Date;
   updatedAt?: Date;

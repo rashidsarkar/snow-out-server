@@ -46,6 +46,8 @@ const taskSchema = new Schema<ITask>(
 
     taskStartedAt: { type: Date },
     taskCompletedAt: { type: Date },
+    markedCompletedFromCustomer: { type: Boolean, default: false },
+    markedCompletedFromProvider: { type: Boolean, default: false },
 
     rating: { type: Number },
     review: { type: String },
