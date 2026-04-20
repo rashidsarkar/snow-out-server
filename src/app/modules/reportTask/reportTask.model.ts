@@ -8,14 +8,14 @@ const reportTaskSchema = new Schema<IReportTask>(
     reporterId: { type: String, required: true },
     reporterRole: { type: String, enum: USER_ROLE, required: true },
     reason: { type: String, required: true },
-    evedence: { type: [String], default: [] },
+    evidence: { type: [String], default: [] },
     note: { type: String },
-    status: {
+    decisionType: {
       type: String,
-
-      default: 'pending',
+      enum: ['payment_to_provider', 'refund_customer', 'pending'],
     },
   },
+
   { timestamps: true },
 );
 

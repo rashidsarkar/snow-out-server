@@ -3,6 +3,8 @@ import auth from '../../middlewares/auth';
 import { uploadFile } from '../../utils/fileUploader';
 import { USER_ROLE } from '../user/user.const';
 import ReportTaskController from './reportTask.controller';
+import validateRequest from '../../middlewares/validateRequest';
+import ReportTaskValidations from './reportTask.validation';
 
 const router = express.Router();
 
@@ -16,7 +18,7 @@ router.post(
     }
     next();
   },
-
+  validateRequest(ReportTaskValidations.createReportTaskData),
   ReportTaskController.createReportTask,
 );
 // Get all
