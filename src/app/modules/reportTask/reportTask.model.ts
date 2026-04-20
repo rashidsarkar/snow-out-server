@@ -13,6 +13,7 @@ const reportTaskSchema = new Schema<IReportTask>(
     decisionType: {
       type: String,
       enum: ['payment_to_provider', 'refund_customer', 'pending'],
+      default: 'pending',
     },
   },
 

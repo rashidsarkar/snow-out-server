@@ -14,8 +14,25 @@ const getAllServices = catchAsync(async (req, res) => {
   });
 });
 
+const addMyService = catchAsync(async (req, res) => {
+  const { serviceId } = req.body;
+
+  const result = await serviceServices.addMyService(
+    req.user.profileId,
+    serviceId,
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Service added successfully',
+    data: result,
+  });
+});
+
 const ServiceController = {
   getAllServices,
+  addMyService,
 };
 
 export default ServiceController;

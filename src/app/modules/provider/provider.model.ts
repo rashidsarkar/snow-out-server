@@ -9,10 +9,6 @@ const providerSchema = new Schema<IProvider>(
       { type: Schema.Types.ObjectId, ref: 'Service', required: true },
     ],
 
-    rating: { type: Number, default: 0 },
-    totalReviews: { type: Number, default: 0 },
-    completedJobs: { type: Number, default: 0 },
-
     bio: { type: String },
 
     isStripeConnected: { type: Boolean, default: false },

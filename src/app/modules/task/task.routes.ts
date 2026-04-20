@@ -43,6 +43,11 @@ router.get(
   auth(USER_ROLE.PROVIDER),
   TaskController.providerTask,
 );
+router.get(
+  '/customer-tasks',
+  auth(USER_ROLE.CUSTOMER),
+  TaskController.customerTask,
+);
 router.patch(
   '/accept-task/:taskId',
   auth(USER_ROLE.PROVIDER),

@@ -109,6 +109,17 @@ const providerTask = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const customerTask = catchAsync(async (req, res) => {
+  const result = await TaskService.customerTask(req.user.profileId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Customer tasks retrieved successfully',
+    data: result,
+  });
+});
+
 const providerAcceptTask = catchAsync(async (req, res) => {
   const { taskId } = req.params;
   const result = await TaskService.providerAcceptTask(
@@ -167,6 +178,7 @@ const TaskController = {
   providerAcceptTask,
   beforeAfterPhotos,
   customerCompleteAndPay,
+  customerTask,
 };
 
 export default TaskController;

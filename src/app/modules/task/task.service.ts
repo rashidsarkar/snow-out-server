@@ -112,6 +112,21 @@ const providerTask = async (profileId: string) => {
   return result;
 };
 
+const customerTask = async (profileId: string) => {
+  const result = await Task.find({ customerId: profileId }).sort({
+    createdAt: -1,
+  });
+
+  if (result.length === 0) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'No tasks found for this customer',
+    );
+  }
+
+  return result;
+};
+
 const providerAcceptTask = async (taskId: string, providerId: string) => {
   const task = await Task.findOneAndUpdate(
     {
@@ -291,6 +306,7 @@ const TaskService = {
   providerAcceptTask,
   beforeAfterPhotos,
   customerCompleteAndPay,
+  customerTask,
 };
 
 export default TaskService;
