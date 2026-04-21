@@ -5,9 +5,23 @@ import router from './app/routes';
 
 import notFound from './app/middlewares/notFound';
 import globalErrorHandler from './app/middlewares/globalErrorhandler';
+import onboardingRefresh from './app/handleStripe/onboardingRefresh';
+import handleConnectedAccountWebhook from './app/stripeManager/connectedAccountWebhook';
+import handlePaymentSuccess from './app/handleStripe/handlePaymentSuccess';
+import handleWebhook from './app/stripeManager/webhook';
 
 const app: Application = express();
-
+// app.post(
+//   '/connected-account-webhook',
+//   express.raw({ type: 'application/json' }),
+//   handleConnectedAccountWebhook,
+// );
+app.post(
+  '/webhook/payment',
+  express.raw({ type: 'application/json' }), // ✅ must
+  handleWebhook,
+);
+// app.get('/payment-success', handlePaymentSuccess);
 // parsers
 app.use(express.json());
 app.use(cookieParser());
@@ -48,6 +62,7 @@ app.use('/api/v1/', router);
 app.use('/uploads', express.static('uploads'));
 //Not Found
 
+app.get('/stripe/onboarding/refresh', onboardingRefresh);
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World! From snow out server with rongila');
 });

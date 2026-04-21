@@ -20,4 +20,10 @@ export default {
   admin_password: process.env.admin_password,
   ONESIGNAL_API_KEY: process.env.ONESIGNAL_API_KEY,
   ONESIGNAL_APP_ID: process.env.ONESIGNAL_APP_ID,
+  stripe: {
+    stripe_secret_key: process.env.STRIPE_SECRET_KEY,
+    connected_account_webhook_secret:
+      process.env.CONNECTED_ACCOUNT_WEBHOOK_SECRET,
+    webhook_secret: process.env.WEBHOOK_SECRET,
+  },
 };

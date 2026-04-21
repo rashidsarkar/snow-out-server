@@ -1,13 +1,7 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
 export interface ICustomer {
-    user: Types.ObjectId;
-    name: string;
-    username?: string;
-    phone?: string;
-    email: string;
-    address?: string;
-    profile_image?: string;
-    totalAmount?: number;
-    totalPoint?: number;
+  user: Types.ObjectId;
+  totalSpent: number;
+  stripeAccountId?: string;
 }

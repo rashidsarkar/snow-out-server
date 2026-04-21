@@ -4,20 +4,25 @@ import { UserServices } from './user.service';
 import sendResponse from '../../utils/sendResponse';
 
 import { StatusCodes } from 'http-status-codes';
-import { updateUserValidationSchema } from './user.validation';
-import { getCloudFrontUrl } from '../../utils/multer-s3-uploader';
+// import { updateUserValidationSchema } from './user.validation';
+// import { getCloudFrontUrl } from '../../utils/multer-s3-uploader';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   // const { files } = req;
   // if (files && typeof files === 'object' && 'profile_image' in files) {
   //   req.body.profile_image = files['profile_image'][0].path;
   // }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const file: any = req.files?.profile_image;
 
-  if (req.files?.profile_image) {
-    req.body.profile_image = getCloudFrontUrl(file[0].key);
+  const { files } = req;
+  if (files && typeof files === 'object' && 'profile_image' in files) {
+    req.body.profile_image = files['profile_image'][0].path;
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // const file: any = req.files?.profile_image;
+
+  // if (req.files?.profile_image) {
+  //   req.body.profile_image = getCloudFrontUrl(file[0].key);
+  // }
   // console.log();
 
   const result = await UserServices.createUserIntoDB(req.body);

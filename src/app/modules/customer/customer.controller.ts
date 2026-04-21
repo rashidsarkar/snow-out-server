@@ -1,24 +1,17 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import customerServices from "./customer.service";
+import { StatusCodes } from 'http-status-codes';
+import sendResponse from '../../utils/sendResponse';
+import CustomerServices from './customer.service';
+import catchAsync from '../../utils/catchAsync';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await customerServices.updateUserProfile(
-        req.user.profileId,
-        req.body
-    );
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Profile updated successfully",
-        data: result,
-    });
+const getAllCustomers = catchAsync(async (req, res) => {
+  const result = await CustomerServices.getAllCustomers(req.query);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Customer retrieved successfully',
+    data: result,
+  });
 });
 
-const CustomerController = { updateUserProfile };
+const CustomerController = { getAllCustomers };
 export default CustomerController;

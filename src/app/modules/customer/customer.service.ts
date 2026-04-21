@@ -1,21 +1,32 @@
-import httpStatus from "http-status";
-import AppError from "../../error/appError";
-import { ICustomer } from "./customer.interface";
-import Customer from "./customer.model";
+import Customer from './customer.model';
 
-const updateUserProfile = async (id: string, payload: Partial<ICustomer>) => {
-    if (payload.email || payload.username) {
-        throw new AppError(httpStatus.BAD_REQUEST, "You cannot change the email or username");
-    }
-    const user = await Customer.findById(id);
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "Profile not found");
-    }
-    return await Customer.findByIdAndUpdate(id, payload, {
-        new: true,
-        runValidators: true,
-    });
+const getAllCustomers = async (query: Record<string, unknown>) => {
+  //   const queryObj = { ...query };
+  //   const page = Number(query.page) || 1;
+  //   const limit = Number(query.limit) || 10;
+  //   const skip = (page - 1) * limit;
+  //   const search = query.search || '';
+  //   const searchAbleFields = ['title', 'content'];
+  //   const excludeField = ['search', 'sortOrder', 'sortBy'];
+  //   excludeField.forEach((key) => delete queryObj[key]);
+  //   const filters: any = {};
+  //   Object.keys(query).forEach((key) => {
+  //     if (
+  //       ![
+  //         'searchTerm',
+  //         'page',
+  //         'limit',
+  //         'sortBy',
+  //         'sortOrder',
+  //         'isBlocked',
+  //       ].includes(key)
+  //     ) {
+  //       filters[key] = query[key];
+  //     }
+  //   });
+  const result = await Customer.find();
+  return result;
 };
 
-const CustomerServices = { updateUserProfile };
+const CustomerServices = { getAllCustomers };
 export default CustomerServices;
