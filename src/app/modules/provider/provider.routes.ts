@@ -13,6 +13,7 @@ router.patch(
   auth(USER_ROLE.PROVIDER),
   ProviderController.updateLocation,
 );
+
 router.get('/:id', ProviderController.getProviderById);
 
 router.patch('/:id', ProviderController.updateProvider);

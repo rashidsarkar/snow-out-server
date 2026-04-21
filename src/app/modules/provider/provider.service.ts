@@ -4,6 +4,8 @@ import AppError from '../../errors/AppError';
 import { IProvider } from '../provider/provider.interface';
 import Provider from '../provider/provider.model';
 import mongoose from 'mongoose';
+import Review from '../review/review.model';
+import Task from '../task/task.model';
 
 // 🔹 Create
 const createProvider = async (payload: IProvider) => {
@@ -161,15 +163,45 @@ const getAllProviders = async (query: Record<string, any>) => {
 
 // 🔹 Get Single
 const getProviderById = async (id: string) => {
-  const result = await Provider.findById(id)
-    .populate('userId')
+  const provider = await Provider.findById(id)
+    .populate({
+      path: 'user',
+      select: '-password -verifyEmailOTP -verifyEmailOTPExpire -__v',
+    })
     .populate('serviceId');
 
-  if (!result) {
+  if (!provider) {
     throw new AppError(StatusCodes.NOT_FOUND, 'Provider not found');
   }
 
-  return result;
+  // ⭐ REVIEWS
+  const reviews = await Review.find({ provider: id });
+
+  // 📦 TASKS
+  const tasks = await Task.find({ provider: id });
+
+  const totalTasks = tasks.length;
+
+  const completedTasks = tasks.filter(
+    (t) => t.taskStatus === 'COMPLETED',
+  ).length;
+
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0;
+
+  const totalReviews = reviews.length;
+
+  return {
+    provider,
+    stats: {
+      avgRating,
+      totalReviews,
+      totalTasks,
+      completedTasks,
+    },
+  };
 };
 
 // 🔹 Update
