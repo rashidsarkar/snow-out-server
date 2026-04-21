@@ -15,8 +15,17 @@ const providerSchema = new Schema<IProvider>(
     stripeAccountId: { type: String },
 
     address: { type: String },
-    latitude: { type: Number },
-    longitude: { type: Number },
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+      },
+    },
   },
   { timestamps: true },
 );

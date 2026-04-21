@@ -14,8 +14,10 @@ export interface IProvider {
   stripeAccountId?: string;
 
   address?: string;
-  latitude?: number;
-  longitude?: number;
+  location: {
+    type: 'Point';
+    coordinates: [number, number]; // [longitude, latitude]
+  };
 
   createdAt?: Date;
   updatedAt?: Date;
