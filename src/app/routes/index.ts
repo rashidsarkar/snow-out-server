@@ -10,6 +10,7 @@ import { stripeRoutes } from '../modules/stripe/stripe.routes';
 import { reportTaskRoutes } from '../modules/reportTask/reportTask.routes';
 import { reviewRoutes } from '../modules/review/review.routes';
 import { ServiceRoutes } from '../modules/service/service.routes';
+import { ProviderRoutes } from '../modules/provider/provider.routes';
 // import { paymentRoutes } from '../modules/payment/payment.routes';
 
 const router = Router();
@@ -58,6 +59,10 @@ const moduleRoutes = [
   {
     path: '/service',
     route: ServiceRoutes,
+  },
+  {
+    path: '/provider',
+    route: ProviderRoutes,
   },
 ];
 

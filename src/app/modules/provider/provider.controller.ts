@@ -1,6 +1,6 @@
-import catchAsync from '../../utilities/catchasync';
-import sendResponse from '../../utilities/sendResponse';
-import httpStatus from 'http-status';
+import { StatusCodes } from 'http-status-codes';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
 import ProviderService from './provider.service';
 
 // Create
@@ -8,7 +8,7 @@ const createProvider = catchAsync(async (req, res) => {
   const result = await ProviderService.createProvider(req.body);
 
   sendResponse(res, {
-    statusCode: httpStatus.CREATED,
+    statusCode: StatusCodes.CREATED,
     success: true,
     message: 'Provider created successfully',
     data: result,
@@ -17,10 +17,10 @@ const createProvider = catchAsync(async (req, res) => {
 
 // Get All
 const getAllProviders = catchAsync(async (req, res) => {
-  const result = await ProviderService.getAllProviders();
+  const result = await ProviderService.getAllProviders(req.query);
 
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: StatusCodes.OK,
     success: true,
     message: 'Providers retrieved successfully',
     data: result,
@@ -32,7 +32,7 @@ const getProviderById = catchAsync(async (req, res) => {
   const result = await ProviderService.getProviderById(req.params.id);
 
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: StatusCodes.OK,
     success: true,
     message: 'Provider retrieved successfully',
     data: result,
@@ -44,7 +44,7 @@ const updateProvider = catchAsync(async (req, res) => {
   const result = await ProviderService.updateProvider(req.params.id, req.body);
 
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: StatusCodes.OK,
     success: true,
     message: 'Provider updated successfully',
     data: result,
@@ -56,7 +56,7 @@ const deleteProvider = catchAsync(async (req, res) => {
   const result = await ProviderService.deleteProvider(req.params.id);
 
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: StatusCodes.OK,
     success: true,
     message: 'Provider deleted successfully',
     data: result,
