@@ -56,12 +56,40 @@ const getSingleReview = async (id: string) => {
 };
 
 // ✅ Provider Average Rating
-const getProviderAvgRating = async (providerId: string) => {
-  if (!mongoose.Types.ObjectId.isValid(providerId)) {
-    throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid provider ID');
-  }
+// const getProviderAvgRating = async (providerId: string) => {
+//   if (!mongoose.Types.ObjectId.isValid(providerId)) {
+//     throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid provider ID');
+//   }
 
+//   const result = await Review.aggregate([
+//     {
+//       $lookup: {
+//         from: 'tasks',
+//         localField: 'task',
+//         foreignField: '_id',
+//         as: 'taskInfo',
+//       },
+//     },
+//     { $unwind: '$taskInfo' },
+//     {
+//       $match: {
+//         'taskInfo.provider': new mongoose.Types.ObjectId(providerId),
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: null,
+//         avgRating: { $avg: '$rating' },
+//         totalReviews: { $sum: 1 },
+//       },
+//     },
+//   ]);
+
+//   return result[0] || { avgRating: 0, totalReviews: 0 };
+// };
+const getProviderReviews = async (providerId: string) => {
   const result = await Review.aggregate([
+    // 🔗 TASK JOIN
     {
       $lookup: {
         from: 'tasks',
@@ -71,21 +99,73 @@ const getProviderAvgRating = async (providerId: string) => {
       },
     },
     { $unwind: '$taskInfo' },
+
+    // 🔗 CUSTOMER JOIN
+    {
+      $lookup: {
+        from: 'customers',
+        localField: 'taskInfo.customerId',
+        foreignField: '_id',
+        as: 'customer',
+      },
+    },
+    { $unwind: '$customer' },
+
+    // 🔗 USER JOIN (real name source)
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'customer.user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    { $unwind: '$user' },
+
+    // 🎯 FILTER PROVIDER
     {
       $match: {
         'taskInfo.provider': new mongoose.Types.ObjectId(providerId),
       },
     },
+
+    // ⭐ STATS + DATA
     {
-      $group: {
-        _id: null,
-        avgRating: { $avg: '$rating' },
-        totalReviews: { $sum: 1 },
+      $facet: {
+        stats: [
+          {
+            $group: {
+              _id: null,
+              avgRating: { $avg: '$rating' },
+              totalReviews: { $sum: 1 },
+            },
+          },
+        ],
+
+        reviews: [
+          {
+            $project: {
+              _id: 1,
+              rating: 1,
+              review: 1,
+              createdAt: 1,
+
+              // 👇 FINAL REVIEWER NAME
+              reviewerName: '$user.fullName',
+            },
+          },
+        ],
       },
     },
   ]);
 
-  return result[0] || { avgRating: 0, totalReviews: 0 };
+  return {
+    stats: result[0]?.stats[0] || {
+      avgRating: 0,
+      totalReviews: 0,
+    },
+    reviews: result[0]?.reviews || [],
+  };
 };
 
 const getTopRatedProviders = async (limit = 5) => {
@@ -161,12 +241,12 @@ const getTopRatedProviders = async (limit = 5) => {
 
   return result;
 };
-
+// const
 const ReviewService = {
   createReview,
   getAllReviews,
   getSingleReview,
-  getProviderAvgRating,
+  getProviderAvgRating: getProviderReviews,
   getTopRatedProviders,
 };
 

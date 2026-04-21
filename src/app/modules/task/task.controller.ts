@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import TaskService from './task.service';
+import { TaskStatus } from './task.interface';
 
 // Get all tasks
 const getAllTasks = catchAsync(async (req, res) => {
@@ -100,7 +101,10 @@ const findAnotherProviderForTask = catchAsync(async (req, res) => {
   });
 });
 const providerTask = catchAsync(async (req, res) => {
-  const result = await TaskService.providerTask(req.user.profileId);
+  const result = await TaskService.providerTask(
+    req.user.profileId,
+    req.query.status as TaskStatus,
+  );
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -110,7 +114,10 @@ const providerTask = catchAsync(async (req, res) => {
   });
 });
 const customerTask = catchAsync(async (req, res) => {
-  const result = await TaskService.customerTask(req.user.profileId);
+  const result = await TaskService.customerTask(
+    req.user.profileId,
+    req.query.status as TaskStatus,
+  );
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

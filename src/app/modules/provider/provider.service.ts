@@ -66,7 +66,7 @@ const getAllProviders = async (query: Record<string, any>) => {
     },
   });
 
-  // 🔍 SEARCH (provider name)
+  // 🔍 SEARCH
   if (search) {
     pipeline.push({
       $match: {
@@ -75,7 +75,7 @@ const getAllProviders = async (query: Record<string, any>) => {
     });
   }
 
-  // 🎯 FILTER BY SERVICE
+  // 🎯 SERVICE FILTER
   if (serviceId) {
     pipeline.push({
       $match: {
@@ -84,17 +84,27 @@ const getAllProviders = async (query: Record<string, any>) => {
     });
   }
 
-  // ⭐ REVIEWS
+  // 🔗 TASKS (IMPORTANT)
+  pipeline.push({
+    $lookup: {
+      from: 'tasks',
+      localField: '_id',
+      foreignField: 'provider',
+      as: 'tasks',
+    },
+  });
+
+  // 🔗 REVIEWS (FIXED: TASK-BASED)
   pipeline.push({
     $lookup: {
       from: 'reviews',
-      localField: '_id',
-      foreignField: 'provider',
+      localField: 'tasks._id',
+      foreignField: 'task',
       as: 'reviews',
     },
   });
 
-  // ⭐ CALCULATIONS
+  // ⭐ CALCULATIONS (FIXED)
   pipeline.push({
     $addFields: {
       avgRating: { $ifNull: [{ $avg: '$reviews.rating' }, 0] },
@@ -102,7 +112,7 @@ const getAllProviders = async (query: Record<string, any>) => {
     },
   });
 
-  // 🧹 CLEAN RESPONSE (ONLY REQUIRED FIELDS)
+  // 🧹 CLEAN RESPONSE
   pipeline.push({
     $project: {
       _id: 1,
@@ -118,7 +128,7 @@ const getAllProviders = async (query: Record<string, any>) => {
           as: 's',
           in: {
             _id: '$$s._id',
-            name: '$$s.type', // ✅ from service schema
+            name: '$$s.type', // from your schema
           },
         },
       },
@@ -160,9 +170,9 @@ const getAllProviders = async (query: Record<string, any>) => {
     data: result[0]?.data || [],
   };
 };
-
 // 🔹 Get Single
 const getProviderById = async (id: string) => {
+  // 👤 PROVIDER
   const provider = await Provider.findById(id)
     .populate({
       path: 'user',
@@ -174,24 +184,27 @@ const getProviderById = async (id: string) => {
     throw new AppError(StatusCodes.NOT_FOUND, 'Provider not found');
   }
 
-  // ⭐ REVIEWS
-  const reviews = await Review.find({ provider: id });
-
   // 📦 TASKS
   const tasks = await Task.find({ provider: id });
 
   const totalTasks = tasks.length;
-
   const completedTasks = tasks.filter(
     (t) => t.taskStatus === 'COMPLETED',
   ).length;
 
-  const avgRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : 0;
+  const taskIds = tasks.map((t) => t._id);
+
+  // ⭐ REVIEWS (FIXED: via task)
+  const reviews = await Review.find({
+    task: { $in: taskIds },
+  });
 
   const totalReviews = reviews.length;
+
+  const avgRating =
+    totalReviews > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+      : 0;
 
   return {
     provider,

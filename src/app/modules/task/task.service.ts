@@ -97,8 +97,11 @@ const findAnotherProviderForTask = async (
   return task;
 };
 
-const providerTask = async (profileId: string) => {
-  const result = await Task.find({ provider: profileId }).sort({
+const providerTask = async (profileId: string, status: TaskStatus) => {
+  const result = await Task.find({
+    provider: profileId,
+    taskStatus: status,
+  }).sort({
     createdAt: -1,
   });
 
@@ -112,8 +115,11 @@ const providerTask = async (profileId: string) => {
   return result;
 };
 
-const customerTask = async (profileId: string) => {
-  const result = await Task.find({ customerId: profileId }).sort({
+const customerTask = async (profileId: string, status: TaskStatus) => {
+  const result = await Task.find({
+    customerId: profileId,
+    taskStatus: status,
+  }).sort({
     createdAt: -1,
   });
 
