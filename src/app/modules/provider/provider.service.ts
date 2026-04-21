@@ -19,7 +19,26 @@ const getAllProviders = async (query: Record<string, any>) => {
   const limit = Number(query.limit) || 10;
   const skip = (page - 1) * limit;
 
+  const lat = Number(query.latitude);
+  const lng = Number(query.longitude);
+  const radius = Number(query.radius) || 10;
+
   const pipeline: any[] = [];
+
+  // 📍 GEO FILTER (MUST BE FIRST)
+  if (!isNaN(lat) && !isNaN(lng)) {
+    pipeline.push({
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [lng, lat], // ⚠️ lng first
+        },
+        distanceField: 'distance',
+        spherical: true,
+        maxDistance: radius * 1000, // km → meter
+      },
+    });
+  }
 
   // 🔗 join user
   pipeline.push(
@@ -96,7 +115,9 @@ const getAllProviders = async (query: Record<string, any>) => {
   });
 
   // 🔥 sorting
-  if (sortBy === 'topRated') {
+  if (!isNaN(lat) && !isNaN(lng)) {
+    pipeline.push({ $sort: { distance: 1 } });
+  } else if (sortBy === 'topRated') {
     pipeline.push({ $sort: { avgRating: -1 } });
   } else if (sortBy === 'mostCompleted') {
     pipeline.push({ $sort: { totalCompleted: -1 } });
@@ -104,7 +125,7 @@ const getAllProviders = async (query: Record<string, any>) => {
     pipeline.push({ $sort: { createdAt: -1 } });
   }
 
-  // 📄 pagination using FACET
+  // 📄 pagination
   pipeline.push({
     $facet: {
       data: [{ $skip: skip }, { $limit: limit }],
@@ -114,19 +135,17 @@ const getAllProviders = async (query: Record<string, any>) => {
 
   const result = await Provider.aggregate(pipeline);
 
-  const data = result[0].data;
-  const total = result[0].meta[0]?.total || 0;
-
   return {
     meta: {
       page,
       limit,
-      total,
-      totalPage: Math.ceil(total / limit),
+      total: result[0]?.meta[0]?.total || 0,
+      totalPage: Math.ceil((result[0]?.meta[0]?.total || 0) / limit),
     },
-    data,
+    data: result[0]?.data || [],
   };
 };
+
 // 🔹 Get Single
 const getProviderById = async (id: string) => {
   const result = await Provider.findById(id)
@@ -165,12 +184,40 @@ const deleteProvider = async (id: string) => {
   return result;
 };
 
+const updateMyLocation = async (
+  profileId: string,
+  latitude: number,
+  longitude: number,
+) => {
+  // 🔍 check provider exists
+  const isExist = await Provider.findOne({ _id: profileId });
+
+  if (!isExist) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Provider not found');
+  }
+
+  // 📍 update geo location
+  const updatedProvider = await Provider.findOneAndUpdate(
+    { _id: profileId },
+    {
+      location: {
+        type: 'Point',
+        coordinates: [longitude, latitude], // ⚠️ lng first
+      },
+    },
+    { new: true },
+  );
+
+  return updatedProvider;
+};
+
 const ProviderService = {
   createProvider,
   getAllProviders,
   getProviderById,
   updateProvider,
   deleteProvider,
+  updateMyLocation,
 };
 
 export default ProviderService;

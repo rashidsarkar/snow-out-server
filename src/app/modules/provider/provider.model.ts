@@ -29,6 +29,6 @@ const providerSchema = new Schema<IProvider>(
   },
   { timestamps: true },
 );
-
+providerSchema.index({ location: '2dsphere' });
 const Provider = model<IProvider>('Provider', providerSchema);
 export default Provider;

@@ -8,8 +8,6 @@ export const createProvider = z.object({
     bio: z.string().optional(),
 
     address: z.string().optional(),
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
   }),
 });
 

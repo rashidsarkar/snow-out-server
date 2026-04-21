@@ -62,6 +62,22 @@ const deleteProvider = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const updateLocation = catchAsync(async (req, res) => {
+  const { latitude, longitude } = req.body;
+
+  const result = await ProviderService.updateMyLocation(
+    req.user.profileId,
+    Number(latitude),
+    Number(longitude),
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Location updated successfully',
+    data: result,
+  });
+});
 
 const ProviderController = {
   createProvider,
@@ -69,6 +85,7 @@ const ProviderController = {
   getProviderById,
   updateProvider,
   deleteProvider,
+  updateLocation,
 };
 
 export default ProviderController;
