@@ -12,6 +12,7 @@ const createProvider = async (payload: IProvider) => {
 };
 
 // 🔹 Get All
+
 const getAllProviders = async (query: Record<string, any>) => {
   const { search, serviceId, sortBy } = query;
 
@@ -25,22 +26,22 @@ const getAllProviders = async (query: Record<string, any>) => {
 
   const pipeline: any[] = [];
 
-  // 📍 GEO FILTER (MUST BE FIRST)
+  // 📍 GEO FILTER (must be first)
   if (!isNaN(lat) && !isNaN(lng)) {
     pipeline.push({
       $geoNear: {
         near: {
           type: 'Point',
-          coordinates: [lng, lat], // ⚠️ lng first
+          coordinates: [lng, lat],
         },
         distanceField: 'distance',
         spherical: true,
-        maxDistance: radius * 1000, // km → meter
+        maxDistance: radius * 1000,
       },
     });
   }
 
-  // 🔗 join user
+  // 👤 USER JOIN
   pipeline.push(
     {
       $lookup: {
@@ -53,7 +54,17 @@ const getAllProviders = async (query: Record<string, any>) => {
     { $unwind: '$user' },
   );
 
-  // 🔍 search
+  // 🛠 SERVICE JOIN
+  pipeline.push({
+    $lookup: {
+      from: 'services',
+      localField: 'serviceId',
+      foreignField: '_id',
+      as: 'services',
+    },
+  });
+
+  // 🔍 SEARCH (provider name)
   if (search) {
     pipeline.push({
       $match: {
@@ -62,7 +73,7 @@ const getAllProviders = async (query: Record<string, any>) => {
     });
   }
 
-  // 🎯 filter service
+  // 🎯 FILTER BY SERVICE
   if (serviceId) {
     pipeline.push({
       $match: {
@@ -71,42 +82,17 @@ const getAllProviders = async (query: Record<string, any>) => {
     });
   }
 
-  // 🔗 tasks
-  pipeline.push({
-    $lookup: {
-      from: 'tasks',
-      localField: '_id',
-      foreignField: 'provider',
-      as: 'tasks',
-    },
-  });
-
-  // 🧾 completed count
-  pipeline.push({
-    $addFields: {
-      totalCompleted: {
-        $size: {
-          $filter: {
-            input: '$tasks',
-            as: 'task',
-            cond: { $eq: ['$$task.taskStatus', 'COMPLETED'] },
-          },
-        },
-      },
-    },
-  });
-
-  // 🔗 reviews
+  // ⭐ REVIEWS
   pipeline.push({
     $lookup: {
       from: 'reviews',
-      localField: 'tasks._id',
-      foreignField: 'task',
+      localField: '_id',
+      foreignField: 'provider',
       as: 'reviews',
     },
   });
 
-  // ⭐ rating
+  // ⭐ CALCULATIONS
   pipeline.push({
     $addFields: {
       avgRating: { $ifNull: [{ $avg: '$reviews.rating' }, 0] },
@@ -114,18 +100,45 @@ const getAllProviders = async (query: Record<string, any>) => {
     },
   });
 
-  // 🔥 sorting
+  // 🧹 CLEAN RESPONSE (ONLY REQUIRED FIELDS)
+  pipeline.push({
+    $project: {
+      _id: 1,
+
+      user: {
+        fullName: 1,
+        email: 1,
+      },
+
+      services: {
+        $map: {
+          input: '$services',
+          as: 's',
+          in: {
+            _id: '$$s._id',
+            name: '$$s.type', // ✅ from service schema
+          },
+        },
+      },
+
+      avgRating: 1,
+      totalReviews: 1,
+      distance: 1,
+    },
+  });
+
+  // 🔥 SORTING
   if (!isNaN(lat) && !isNaN(lng)) {
     pipeline.push({ $sort: { distance: 1 } });
   } else if (sortBy === 'topRated') {
     pipeline.push({ $sort: { avgRating: -1 } });
-  } else if (sortBy === 'mostCompleted') {
-    pipeline.push({ $sort: { totalCompleted: -1 } });
+  } else if (sortBy === 'mostReviewed') {
+    pipeline.push({ $sort: { totalReviews: -1 } });
   } else {
     pipeline.push({ $sort: { createdAt: -1 } });
   }
 
-  // 📄 pagination
+  // 📄 PAGINATION
   pipeline.push({
     $facet: {
       data: [{ $skip: skip }, { $limit: limit }],
