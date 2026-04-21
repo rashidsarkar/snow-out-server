@@ -72,6 +72,8 @@ router.patch(
   auth(USER_ROLE.CUSTOMER),
   TaskController.customerCompleteAndPay,
 );
+
+router.get('/singleTask/:id', TaskController.singleTask);
 router.patch('/:id', TaskController.updateTask);
 router.get('/:id', TaskController.getTaskById);
 export const TaskRoutes = router;

@@ -173,6 +173,17 @@ const customerCompleteAndPay = catchAsync(async (req, res) => {
   });
 });
 
+const singleTask = catchAsync(async (req, res) => {
+  const result = await TaskService.singleTask(req.params.id);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'singleTask  retrieved successfully',
+    data: result,
+  });
+});
+
 const TaskController = {
   getAllTasks,
   createTask,
@@ -186,6 +197,7 @@ const TaskController = {
   beforeAfterPhotos,
   customerCompleteAndPay,
   customerTask,
+  singleTask,
 };
 
 export default TaskController;

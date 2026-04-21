@@ -299,7 +299,34 @@ const customerCompleteAndPay = async (taskId: string, profileId: string) => {
 
   return updatedTask;
 };
+const singleTask = async (id: string) => {
+  const task = await Task.findById(id)
+    .populate({
+      path: 'customerId',
+      populate: {
+        path: 'user',
+        select: 'fullName email phone',
+      },
+    })
+    .populate({
+      path: 'provider',
+      populate: {
+        path: 'user',
+        select: 'fullName email phone',
+      },
+    })
+    // ✅ FIX HERE
+    .populate({
+      path: 'serviceType',
+      select: 'type',
+    });
 
+  if (!task) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Task not found');
+  }
+
+  return task;
+};
 const TaskService = {
   getAllTasks,
   createTask,
@@ -313,6 +340,7 @@ const TaskService = {
   beforeAfterPhotos,
   customerCompleteAndPay,
   customerTask,
+  singleTask,
 };
 
 export default TaskService;
